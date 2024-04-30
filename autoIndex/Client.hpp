@@ -47,7 +47,9 @@ class Client {
         void            clearRequest();
         void            clearAll();
 
-        std::string     handleAutoIndex(std::string servRoot, std::string locRoot);
+        void            setUri(const std::string& uri) {_request._uri = uri;};
+
+        std::string     handleAutoIndex(std::string servRoot);
 
         void printAllHeaders() const;
 };

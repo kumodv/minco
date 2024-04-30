@@ -9,12 +9,13 @@ int main() {
     client.setBuffer(httpRequest);
 
     // 자동 인덱스 페이지 생성
-    std::string servRoot = "/path/to/server/root";
-    std::string locRoot = "/directory/";
-    std::string autoIndexHtml = client.handleAutoIndex(servRoot, locRoot);
+    std::string servRoot = "/workspaces/minco/autoIndex/";
+    // std::string locRoot = "";
+    client.setUri("");
+    std::string autoIndexHtml = client.handleAutoIndex(servRoot);
 
     // 생성된 자동 인덱스 페이지 출력
-    std::cout << "Auto Index HTML:\n" << autoIndexHtml << std::endl;
+    std::cout << autoIndexHtml << std::endl;
 
     return 0;
 }

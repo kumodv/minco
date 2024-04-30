@@ -1,46 +1,85 @@
 #include <dirent.h>
 #include <iostream>
-// #include <fstream>
 #include <sstream>
 #include <string>
-// #include <cstring>
 #include <vector>
+#include <algorithm> // 추가: 정렬을 위한 헤더
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <string.h>
-
+#include <cstring>
+#include <iomanip>
 #include "Client.hpp"
 
-// #include <stat.h>
-
-std::string Client::handleAutoIndex(std::string servRoot, std::string locRoot)
+std::string FormatTime(time_t time)
 {
-	std::string dirPath = servRoot + locRoot;
+	char buffer[80];
+	struct tm *timeinfo = localtime(&time);
+	strftime(buffer, 80, "%Y-%m-%d %H:%M:%S", timeinfo);
+	return std::string(buffer);
+}
 
-	struct stat st;
-	if (stat(path.c_str(), &st) == -1 || !S_ISDIR(st.st_mode))
+std::string FormatSize(double size)
+{
+	const char *sizes[] = { "B", "KB", "MB", "GB", "TB" };
+	int i = 0;
+	while (size > 1024)
 	{
-		_responseStatus = 404;
-		return;
+		size /= 1024;
+		i++;
 	}
 
+	std::ostringstream oss;
+	oss << std::fixed << std::setprecision(2) <<size << sizes[i];
+	return oss.str();
+}
+
+std::string Client::handleAutoIndex(std::string servRoot)
+{
+    std::string locRoot = _request._uri;
+    std::string dirPath = servRoot + locRoot;
+
+    struct stat fileStat;
     std::stringstream body;
-	body << "<html><head><title>Index of " << _request._uri << "</title></head><body><h1>Index of " << _request._uri << "</h1><hr><pre>";
+    body << "<html>\n<head>\n<title>Index of " << locRoot << "</title>\n</head>\n<body>\n";
+    body << "<h1>Index of " << locRoot << "</h1>\n";
+	body << "<hr> <pre>\n<table>\n<tr><th></th><th></th><th></th></tr>\n";
 
-	DIR *dir = opendir(dirPath.c_str());
-	if (dir) {
-		struct dirent *ent;
-		while ((ent = readdir(dir)) != NULL) {
-			if (ent->d_type == DT_DIR) {
-				if (strcmp(ent->d_name, ".") != 0 && strcmp(ent->d_name, "..") != 0)
-				body << "<a href=\"" << ent->d_name << "/\">" << ent->d_name << "/</a><br>";
-			}
-			else
-				body << "<a href=\"" << ent->d_name << "\">" << ent->d_name << "</a><br>";
-		}
-		closedir(dir);
+    DIR *dir = opendir(dirPath.c_str());
+	if (dir == NULL) {
+		_responseStatus = 404;
+		return "";
 	}
-	body << "</pre><hr></body></html>";
+    if (dir)
+    {
+        std::vector<std::string> fileList;
+        struct dirent *ent;
+        while ((ent = readdir(dir)) != NULL)
+            fileList.push_back(ent->d_name);
+        closedir(dir);
 
-	return body.str();
+        std::sort(fileList.begin(), fileList.end());
+
+        int count = fileList.size();
+        for (int i = 0; i < count; i++)
+        {
+            std::string fileName = fileList[i];
+            if (fileName == ".")
+                continue;
+            std::string filePath = dirPath + "/" + fileName;
+            if (stat(filePath.c_str(), &fileStat) == 0)
+            {
+                body << "<tr>" << "<td>";
+                if (S_ISDIR(fileStat.st_mode))
+                    body << "<a href=\"" << fileName << "/\">" << fileName << "/</a>";
+                else
+                    body << "<a href=\"" << fileName << "\">" << fileName << "</a>";
+                body << " </td> <td>\t\t" << FormatTime(fileStat.st_mtime) << "</td>";
+                double fileSize = static_cast<double>(fileStat.st_size);
+                body << "<td>\t\t" << FormatSize(fileSize) << " </td>" << "</tr>\n";
+            }
+        }
+		body << " </table> </pre>\n<hr>\n</body>\n</html>\n";
+    }
+
+    return body.str();
 }
