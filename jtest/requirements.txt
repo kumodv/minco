@@ -1,6 +1,0 @@
-Django
-psycopg2-binary
-djangorestframework
-django-cors-headers
-web3
-django-two-factor-auth
