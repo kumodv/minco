@@ -7,24 +7,16 @@ import Login from "./pages/Login.js";
 // import Main from "./pages/Main.js";
 // import NotFound from "./pages/NotFound.js";
 import { getIsLogin } from "./state/state.js";
-import sidebar from './components/sidebar.js';
+import sidebar from './components/Sidebar.js';
 
 const routes = [
     { path: "/", page: Login, style: "Login" },
-    { path: "/frontend", page: Login, style: "Login" },
-    { path: "/frontend/", page: Login, style: "Login" },
     { path: "/login/oauth2/code", page: Redirect, style: "redirect" },
     { path: "/sidebar", page: sidebar, style: "sidebar" }
 ];
 
 function checkUrl(requestedUrl) {
-    // 경로에서 '/frontend' 제거
-    let cleanUrl = requestedUrl.replace(/^\/frontend/, '');
-    // 빈 문자열이면 '/'로 변경
-    cleanUrl = cleanUrl || '/';
-	console.log(cleanUrl);
-    
-    let match = routes.find((route) => route.path === cleanUrl);
+    let match = routes.find((route) => route.path === requestedUrl);
     return match || routes[0];
 }
 
@@ -33,16 +25,19 @@ export default function changeUrl(requestedUrl, element) {
     console.log("Changing URL to:", requestedUrl);
     resetLayout();
 
-    const $content = document.getElementById('content');
-    if (!$content) {
+    const $app = document.getElementById('app');
+    if (!$app) {
         console.error("Content element not found");
         return;
     }
-    $content.innerHTML = "";
+    $app.innerHTML = "";
 
     const match = checkUrl(requestedUrl);
 
-    const cssPath = `srcs/styles/${match.style}.css`;
+    const cssPath = `/srcs/styles/${match.style}.css`;
+	console.log(match.style);
+	console.log(cssPath);
+	// frontend\srcs\styles\Login.css
     document.getElementById("styles").setAttribute("href", cssPath);
 
     if (match.page === Redirect) {

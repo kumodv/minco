@@ -1,4 +1,38 @@
-function sidebar() {
+import { setLoginState, getMyinfo, logout } from '../state/state.js';
+
+// 테스트를 위한 로그인 상태 설정
+setLoginState(true, 'user1', 'fake-token', 'fake-email', 'fake-nickname', "srcs/logo/pepe.png");
+
+function sideProfile() {
+    const myinfo = getMyinfo();
+    if (!myinfo.userId) {
+        return null;
+    }
+
+    const sideProfile = document.createElement('div');
+    sideProfile.classList.add('user-profile');
+    sideProfile.innerHTML = `
+        <div class="user-info">
+            <img src="${myinfo.image}" alt="User Avatar" class="rounded-circle">
+            <div class="user-details">
+                <span class="user-id">${myinfo.userId}</span>
+            </div>
+        </div>
+        <a href="#" class="exit" id="logoutButton">
+            <img src="srcs/logo/exit.svg" alt="Exit" class="exit-icon">
+        </a>
+    `;
+
+    sideProfile.querySelector('#logoutButton').addEventListener('click', async (e) => {
+        e.preventDefault();
+        await logout();
+    });
+
+    return sideProfile;
+}
+
+function Sidebar() {
+    console.log("Rendering sidebar");
     const sidebar = document.getElementById('sidebar');
     sidebar.innerHTML = `
         <div class="d-flex flex-column h-100">
@@ -25,20 +59,12 @@ function sidebar() {
                     </a>
                 </li>
             </ul>
-            <div class="user-profile">
-                <div class="user-info">
-                    <img src="srcs/logo/pepe.png" alt="User Avatar" class="rounded-circle">
-                    <div class="user-details">
-                        <span class="username">ZaAk Sidki</span>
-                        <span class="user-id">zsidki</span>
-                    </div>
-                </div>
-                <a href="/logout" class="exit">
-                    <img src="srcs/logo/exit.svg" alt="Exit" class="exit-icon">
-                </a>
-            </div>
         </div>
     `;
+    const profileElement = sideProfile();
+    if (profileElement) {
+        sidebar.appendChild(profileElement);
+    }
 }
 
-export default sidebar;
+export default Sidebar;

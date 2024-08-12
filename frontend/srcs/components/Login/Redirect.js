@@ -2,7 +2,7 @@ import changeUrl from '../../router.js';
 import { baseUrl, setLoginState } from '../../state/state.js';
 import TimerRing from '../GameRoom/Timer.js';
 
-import sidebar from '../sidebar.js';
+import sidebar from '../Sidebar.js';
 
 
 export function setupMockAPI() {

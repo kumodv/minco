@@ -1,30 +1,28 @@
+import sidebar from '../components/Sidebar.js';
+
 export default function Login() {
     console.log("Rendering Login page");
     
-    const content = document.getElementById('content');
-    if (!content) {
-        console.error("Content element not found in Login component");
-        return;
-    }
-    
-    content.innerHTML = `
-        <div class="login-container">
-            <div class="login-box">
-                <div class="login-title">Login</div>
-                <div class="loginButton" id="loginButton">
-                    <div class="loginText">42seoul</div>
-                </div>
+    const loginElement = document.createElement("div");    
+    loginElement.classList.add("login-container");
+    loginElement.innerHTML = `
+        <div class="login-box">
+            <div class="login-title">Login</div>
+            <div class="loginButton" id="loginButton">
+                <div class="loginText">42seoul</div>
             </div>
         </div>
     `;
 
+    const appElement = document.getElementById("app");
+    appElement.innerHTML = "";
+    appElement.appendChild(loginElement);
+
     document.getElementById("loginButton").addEventListener("click", () => {
-        // 실제 OAuth 리다이렉트 대신 직접 Redirect 함수 호출
-        import('../components/Login/Redirect.js').then(module => {
-            module.default();
-        });
+        // sidebar();
     });
 }
+
 // import('../components/Login/Redirect.js').then(module => {
 //     module.default();
 // export default function Login() {

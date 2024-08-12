@@ -26,7 +26,6 @@ const setLogoutState = () => {
 	localStorage.removeItem("email");
 	localStorage.removeItem("nickname");
 	localStorage.removeItem("image");
-	changeUrl("/");
 };
 
 const setisLogin = (state) => {
@@ -99,6 +98,7 @@ const getMyinfo = () => {
 	return {
 		userId: getUserId(),
 		nickname: getNickname(),
+		email: getEmail(),
 		image: getImage(),
 	};
 };
@@ -133,11 +133,12 @@ export {
 	setLoginState,
 	setLogoutState,
 	setisLogin,
-	setAccessToken,
+	setNewAccessToken,
 	setNickname,
 	setImage,
 	getIsLogin,
 	getAccessToken,
+	getMyinfo,
 	getUserId,
 	getEmail,
 	getNickname,
